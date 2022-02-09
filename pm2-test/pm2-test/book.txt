@@ -1,0 +1,117 @@
+npm init -y
+npm install pm2 -g
+pm2 --version
+//npm run dev的cmd是等待状态
+//npm run prd的cmd是结束状态
+
+//不加-f,npm run prd会报错
+"prd": "cross-env NODE_ENV=production pm2 start app.js -f"
+根据“Script already launched, add -f option to force re-execution”这句提示，它的意思是说。脚本已经启动了，你可以在启动脚本命令后面加 -f 参数，强制脚本重新启动
+
+
+pm2常用命令：
+pm2 list
+npm run prd
+pm2 restart appName/id //重启1次，会显示restart的次数累加(用了pm2,吧app.js文件内容更改后,需要重启命令，浏览器内容才会变化或者pm2.conf.json的"watch":true会自动监听重启)
+pm2 log appName/id //刷新页面的时候会显示(app.js代码的)cur time+时间戳和假装出错+时间戳
+pm2 stop appName/id
+pm2 delete appName/id
+pm2 info appName/id //当前服务信息
+pm2 monit appName/id //pm2进程的信息 <刷新页面的时候app Logs会显示(app.js代码的)cur time+时间戳和假装出错+时间戳>
+
+
+pm2是后台运行，nodemon是前台运行
+
+
+进程守护：
+node app.js和nodemon app.js，进程奔溃则不能访问
+pm2遇到进程奔溃，会自动重启
+//遇到错误的页面打不开，然后重新输入对的页面会自动重启页面也能打开(app.js的测试代码的/err，localhost:8000/err)
+//刷新页面等的输出和错误日志会被保存，通过日志可以查出错误的原因
+
+
+pm2.conf.json：
+"watch": true，开发环境监听并重启，线上环境不一定（吧app.js的pm2 test server 2的2改为3，刷新localhost:8000网址，"watch": true起到监听重启）
+"ignore_watch": []，不需要监听和重启的文件
+打印的日志存在这里：(刷新页面等的日志会被保存，通过日志可以查出错误的原因)(输出和错误日志不配置会放在默认的位置)
+"error_file": "logs/err.log",//错误日志
+"out_file": "logs/out.log"，//输出日志
+
+
+吧"prd": "cross-env NODE_ENV=production pm2 start app.js -f"改为："prd": "cross-env NODE_ENV=production pm2 start pm2.conf.json"
+
+
+package.json的"main": "index.js"改为"main": "app.js",改不改都没关系
+
+
+pm2 stop app，pm2 delete app，npm run prd，然后pm2.conf.json起作用，刷新localhost:8000网址，打印logs日志
+
+
+为何使用多进程：(使用多进程可以充分利用服务器的资源和(前端电脑的CPU和内存))
+回顾之前讲session时说过，操作系统限制一个进程的内存(操作系统会限制一个进程的最大可用内存)
+内存：无法充分利用机器全部内存
+CPU：无法充分利用多核CPU的优势
+
+-----------------------------
+多进程和redis:
+多进程之间，内存无法共享
+多进程访问一个redis，实现数据共享
+-----------------------------
+
+"instances": 4  这个指多进程，电脑的CPU是2核模拟4核的，写4
+pm2 delete pm2-test-server，然后npm run prd,cmd原来是显示一个运行的pm2-test-server(appName),后面显示4个运行的pm2-test-server(appName)
+注：如果是不delete，直接npm run prd，显示原来的一个运行的pm2-test-server(appName)
+
+
+pm2的核心价值是会自动重启，实时监控文件变化和浏览器网址变化
+多进程会打印出多个文件，即cmd显示4个运行的pm2-test-server(appName)
+使用多进程极大提高CPU和内存
+多进程内存不能共享，通过redis共享
+
+
+//-----------------------------------------------------------------------------------------------
+mongodb安装：
+安装mongodb服务端和安装mongodb客户端，启动和连接
+
+
+服务端的mongodb安装：
+http://mongodb.com/，Software,Community Server,MongoDB Community Server,Download,安装，最后的需要取消勾选联网下载，完成，
+找到安装保存的路径D盘，D:\MongoDB自定义的路径下如果没有data和log文件夹需要新建这两个(data,log和默认的bin是同一文件夹)
+
+data文件夹新建db文件夹,log文件夹新建mongod.log文件,(bin文件夹如果没有mongo.exe和mongod.exe需要重新安装server端的mongodb)
+
+
+//------------------------------------------
+bin文件夹第一个cmd打开：
+D:\MongoDB\bin>mongod.exe --dbpath D:\MongoDB\data\db
+{"address":"127.0.0.1"}，{"port":27017,"ssl":"off"}，默认端口27017
+
+bin文件夹第二个cmd打开：
+D:\MongoDB\bin>mongo.exe --port 27017
+---
+> 1+1
+2(运行成功)
+>
+//------------------------------------------
+
+mongod.exe --dbpath D:\MongoDB\data\db(启动mongodb，指定的路径)
+
+
+
+//-----------------------------------------------------------------------------------------------
+客户端的mongodb安装：
+http://mongodb.com/，Software,Compass,try it now,MongoDB Compass,Download，打开客户端，点击CONNECT按钮，如果这个compass(客户端文档数据库)连接正常会有默认的3个Database Name，
+如果这个compass(客户端文档数据库)连接有问题的话可以吧data>db>mongod.lock删除，再重新启动(D:\MongoDB\bin>mongod.exe --dbpath D:\MongoDB\data\db)，再重新打开客户端的mongodb
+
+
+//------------------------------------------------------------------------------------------
+
+Mongodb使用：
+创建一个数据库database,创建集合collection,文档document的增删改查
+
+Mongodb是一个文档数据库，以文档存储信息，为了更好的管理文档：分三层管理：数据库>集合>文档
+
+和Mysql对比：
+Mongodb数据库-Mysql数据库
+Mongodb集合-Mysql表
+Mongodb文档-Mysql记录(表中的一行数据)

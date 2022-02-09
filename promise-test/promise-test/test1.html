@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <p>{{name}}</p>
+        <p v-for="v in offerin"> <span>{{v.order_type}}</span> <span>{{v.goods}}:{{v.num}}</span> <span>{{v.trade_status}}</span> </p>
+        <p v-for="o in offerout"> <span>{{o.order_type}}</span> <span>{{o.goods}}</span> <span>{{o.trade_status}}</span> </p>
+    </div>
+    <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                name: '',
+                offerin: [],
+                offerout: []
+            },
+            mounted: function() {
+                this.get()
+            },
+            methods: {
+                get: function() {
+                    this.$http.get("https://demo.zhaotaa.com/apps/trade").then(function(res) {
+                            console.log(res)
+                            if (res.body.msg == '返回成功') {
+                                console.log(res.body.data)
+                                var data = res.body.data
+                                this.name = data.name
+                                this.offerin = data.offerin
+                                this.offerout = data.offerout
+                            }
+                        },
+                        function() {
+                            console.log('请求失败处理')
+                        })
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
+
+<head>
+    <title></title>
+</head>
+
+<body>
+    <div>
+        <p>茄子</p>
+        <p><span>卖进：</span><span>预定：</span><span>买进</span><span>报价</span></p>
+    </div>
+
+</body>
+
+</html>
+执行结果如图

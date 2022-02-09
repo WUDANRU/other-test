@@ -1,0 +1,35 @@
+show dbs  //显示数据库(myblog)
+use myblog  //创建或使用数据库(myblog)
+show collections  //显示数据库集合(blogs和users)
+db.blogs.insert({"title":"标题1","content":"内容1","author":"zhangsan"})  //插入，db指的是myblog
+db.aaa.insert({"a":100})  //如果集合没有aaa的话，会创建集合aaa
+db.aaa.find()  //查找
+db.blogs.find()  //查找
+db.blogs.find({"author":"zhangsan"})  //查找
+db.blogs.update({"author":"zhangsan"},{$set:{"title":"标题A"}})  //更新
+db.blogs.remove({条件})  //删除
+db.blogs.find().sort({id:-1})
+
+Mongodb概念：
+数据库 集合 文档 bson NoSQL
+
+数据库database:
+Mongodb可以成为数据库系统(服务)
+一个数据库系统，允许对接很多服务
+每个服务，就对接一个(或多个)数据库
+
+集合collection：
+数据库是一个服务(业务)的数据容器
+一个服务(业务)的数据，要分类管理
+如博客系统，有博客数据，有用户数据
+
+bson：
+JSON是一种常用的数据格式
+JSON是字符串类型的
+BSON=Binary JSON即二进制类型的JSON
+
+NoSQL：
+关系型数据库(如mysql)需要学习SQL语言
+如select content,creator from comments;
+NoSQL数据库则无需用SQL语句查询，易学易用
+mongodb文档数据库是NoSQL数据库，命令行的语句类似js不是SQL语言
